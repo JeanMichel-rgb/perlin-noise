@@ -1,10 +1,18 @@
 extends Node
 
 var seed : float = randi()+randf()
+@export var side : int
+@export var density : int
+@export var details : int
+@export var scale : float
+
+#side is an exponent of 2
+#density is an exponent of 2
+#density-details >= 0
+#side > density
 
 func _ready() -> void:
-	var b_s = 3384937061.58814
-	draw_map_2D(perlin(b_s, 64, 32, 3))
+	draw_map_2D(perlin(seed, pow(2, side), pow(2, density), details))
 
 func perlin(world_seed : float, map_side : int, base_gradient_grid_side : int, quantitie : int):
 	seed = world_seed
@@ -33,7 +41,6 @@ func vetor_angle(ls : int, nosq : int):
 	return gradients_angles
 
 func make_a_perlin(global_map : Array, gradient_angle : Array, map_side : int, ls : float, nosq : int, intensity : float):
-	print(gradient_angle)
 	var gradient : Array = gradient_angle
 	var map : Array = global_map
 	var A = -1
@@ -53,8 +60,8 @@ func make_a_perlin(global_map : Array, gradient_angle : Array, map_side : int, l
 					var c : float = ((x/(ls-1)) * cos(ang_c) + (y-ls)/(ls-1) * sin(ang_c))
 					var d : float = (((x-ls)/(ls-1)) * cos(ang_d) + (y-ls)/(ls-1) * sin(ang_d))
 					#set interpollation's coefficient
-					var t : float = ((x/ls)*(x/ls)*(3-(2*x/ls)))
-					var g : float = ((y/ls)*(y/ls)*(3-(2*y/ls)))
+					var t : float = ease_in_out_quad(x/ls)
+					var g : float = ease_in_out_quad(y/ls)
 					#interpolate dot products
 					var pixel_value : float = interpolation(a,b,c,d,t,g)*intensity
 					#store the value in map
@@ -81,8 +88,8 @@ func sleep(delta : float = 0.001):
 	await get_tree().create_timer(delta).timeout
 
 func draw_map_2D(map : Array):
-	var tiles_size = 3
-	var side = sqrt(map.size())
+	var tiles_size : float = scale
+	var side : int = sqrt(map.size())
 	for y in side:
 		for x in side:
 			var meshinstance : MeshInstance2D = MeshInstance2D.new()

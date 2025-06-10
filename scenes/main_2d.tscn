@@ -4,5 +4,9 @@
 
 [node name="main2d" type="Node"]
 script = ExtResource("1_f41oa")
+side = 7
+density = 6
+details = 6
+scale = 3.0
 
 [node name="map_2D" type="Node2D" parent="."]
